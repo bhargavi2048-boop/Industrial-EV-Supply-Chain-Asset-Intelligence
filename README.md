@@ -1,8 +1,5 @@
 # VoltMind AI
 
-Demo Link: "https://bhargavi2048-boop.github.io/Industrial-EV-Supply-Chain-Asset-Intelligence/"
-Demo Video: "https://drive.google.com/file/d/1W1LP2zd3HgHvzgF-VIF5a9xIETjNQ04N/view?usp=sharing"
-
 **Industrial EV Supply Chain & Asset Intelligence — Interactive Prototype**
 
 VoltMind AI is a front-end prototype for a B2B SaaS platform built for industrial EV fleet operators — logistics companies, last-mile delivery fleets, and industrial transport businesses. It unifies fleet health, predictive maintenance, procurement decision-making, and raw-material supply chain risk into a single AI-assisted workspace.
@@ -10,6 +7,9 @@ VoltMind AI is a front-end prototype for a B2B SaaS platform built for industria
 This repository contains a single self-contained, dependency-free HTML prototype: a full marketing site, an authentication flow, and an 11-module application shell — all interactive, all running entirely in the browser.
 
 ---
+
+Demo Link: "https://bhargavi2048-boop.github.io/Industrial-EV-Supply-Chain-Asset-Intelligence/"
+Demo Video: "https://drive.google.com/file/d/1W1LP2zd3HgHvzgF-VIF5a9xIETjNQ04N/view?usp=sharing"
 
 ## ✨ Highlights
 
