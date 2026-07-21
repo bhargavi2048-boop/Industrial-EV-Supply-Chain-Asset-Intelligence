@@ -9,7 +9,7 @@ This repository contains a single self-contained, dependency-free HTML prototype
 ---
 
 Demo Link: "https://bhargavi2048-boop.github.io/Industrial-EV-Supply-Chain-Asset-Intelligence/"
-Demo Video: "https://drive.google.com/file/d/1W1LP2zd3HgHvzgF-VIF5a9xIETjNQ04N/view?usp=sharing"
+    Demo Video: "https://drive.google.com/file/d/1W1LP2zd3HgHvzgF-VIF5a9xIETjNQ04N/view?usp=sharing"
 
 ## ✨ Highlights
 
