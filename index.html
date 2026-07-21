@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltMind AI — Industrial EV Supply Chain &amp; Asset Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#0F172A; --bg-1:#111827; --bg-2:#1E293B;
+  --panel:rgba(30,41,59,0.55); --panel-border:rgba(148,163,184,0.14);
+  --volt:#00E5A8; --volt-dim:rgba(0,229,168,0.14);
+  --cyan:#00C2FF; --sky:#38BDF8;
+  --text-hi:#F1F5F9; --text-mid:#94A3B8; --text-low:#64748B;
+  --danger:#FB7185; --warn:#FBBF24; --ok:#00E5A8;
+  --radius:16px; --radius-sm:10px;
+  --disp:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(0,229,168,0.10), transparent 60%),
+    radial-gradient(ellipse 800px 600px at 100% 0%, rgba(0,194,255,0.08), transparent 55%),
+    var(--bg-0);
+  color:var(--text-hi); font-family:var(--body); min-height:100vh; overflow-x:hidden;
+}
+::selection{background:var(--volt); color:#031A14;}
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-track{background:var(--bg-0);}
+::-webkit-scrollbar-thumb{background:#334155; border-radius:8px;}
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer; border:none;}
+.hex-tex{
+  background-image:
+    repeating-linear-gradient(60deg, rgba(148,163,184,0.05) 0, rgba(148,163,184,0.05) 1px, transparent 1px, transparent 44px),
+    repeating-linear-gradient(-60deg, rgba(148,163,184,0.05) 0, rgba(148,163,184,0.05) 1px, transparent 1px, transparent 44px),
+    repeating-linear-gradient(0deg, rgba(148,163,184,0.04) 0, rgba(148,163,184,0.04) 1px, transparent 1px, transparent 44px);
+}
+.glass{
+  background:var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--volt); display:flex; align-items:center; gap:8px; font-weight:600;
+}
+.eyebrow::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--volt); box-shadow:0 0 10px var(--volt);}
+.grad-text{background:linear-gradient(90deg,#F1F5F9 20%,var(--volt) 65%,var(--cyan) 100%); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.btn{
+  padding:13px 26px; border-radius:10px; font-weight:600; font-size:14.5px; display:inline-flex; align-items:center; gap:8px;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+.btn-primary{background:linear-gradient(90deg,var(--volt),#00c98f); color:#052b21; box-shadow:0 8px 24px -8px rgba(0,229,168,0.55);}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 12px 30px -8px rgba(0,229,168,0.7);}
+.btn-ghost{background:rgba(148,163,184,0.06); border:1px solid var(--panel-border); color:var(--text-hi);}
+.btn-ghost:hover{border-color:rgba(0,229,168,0.4); background:rgba(0,229,168,0.06);}
+.pill{font-family:var(--mono); font-size:11px; padding:4px 10px; border-radius:999px; font-weight:600; letter-spacing:.03em;}
+.pill-ok{background:rgba(0,229,168,0.12); color:var(--volt); border:1px solid rgba(0,229,168,0.3);}
+.pill-warn{background:rgba(251,191,36,0.12); color:var(--warn); border:1px solid rgba(251,191,36,0.3);}
+.pill-danger{background:rgba(251,113,133,0.12); color:var(--danger); border:1px solid rgba(251,113,133,0.3);}
+.pill-info{background:rgba(0,194,255,0.12); color:var(--cyan); border:1px solid rgba(0,194,255,0.3);}
+h1,h2,h3,h4{font-family:var(--disp); font-weight:600; letter-spacing:-0.01em;}
+.mono{font-family:var(--mono);}
+.container{max-width:1280px; margin:0 auto; padding:0 32px;}
+
+/* ===== LANDING ===== */
+#landing-view{display:block;}
+#app-view{display:none;}
+.nav{
+  position:sticky; top:0; z-index:50; padding:18px 0;
+  background:rgba(15,23,42,0.75); backdrop-filter:blur(14px); border-bottom:1px solid var(--panel-border);
+}
+.nav .container{display:flex; align-items:center; justify-content:space-between;}
+.logo{display:flex; align-items:center; gap:10px; font-family:var(--disp); font-weight:700; font-size:19px;}
+.logo-mark{width:30px; height:30px; position:relative;}
+.nav-links{display:flex; gap:34px; font-size:14px; color:var(--text-mid); font-weight:500;}
+.nav-links a:hover{color:var(--text-hi);}
+.nav-cta{display:flex; gap:12px; align-items:center;}
+.nav-cta .btn{padding:10px 20px; font-size:13.5px;}
+
+.hero{padding:88px 0 60px; position:relative;}
+.hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:56px; align-items:center;}
+.hero h1{font-size:52px; line-height:1.08; margin:20px 0 22px; letter-spacing:-0.02em;}
+.hero p.lede{font-size:17px; color:var(--text-mid); line-height:1.7; max-width:520px; margin-bottom:32px;}
+.hero-ctas{display:flex; gap:14px; margin-bottom:38px;}
+.hero-stats{display:flex; gap:36px;}
+.hero-stat b{font-family:var(--mono); font-size:22px; color:var(--text-hi); display:block;}
+.hero-stat span{font-size:12px; color:var(--text-low);}
+
+.dash-preview{border-radius:20px; padding:20px; position:relative; overflow:hidden;}
+.dash-preview::before{content:''; position:absolute; inset:0; padding:1px; border-radius:20px;
+  background:linear-gradient(135deg, rgba(0,229,168,0.5), rgba(0,194,255,0.1), transparent 60%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;}
+.dash-preview-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+.dash-preview-head .dots{display:flex; gap:6px;}
+.dash-preview-head .dots span{width:8px; height:8px; border-radius:50%; background:#334155; display:block;}
+.mini-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px;}
+.mini-card{background:rgba(255,255,255,0.03); border:1px solid var(--panel-border); border-radius:10px; padding:12px;}
+.mini-card .lab{font-size:10px; color:var(--text-low); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;}
+.mini-card .val{font-family:var(--mono); font-size:18px; font-weight:600;}
+.mini-card .val.up{color:var(--volt);}
+.pulse-line{width:100%; height:90px; border-radius:10px; overflow:hidden; background:rgba(255,255,255,0.02); border:1px solid var(--panel-border);}
+
+.section{padding:88px 0;}
+.section-head{max-width:640px; margin-bottom:52px;}
+.section-head h2{font-size:34px; margin-top:14px; letter-spacing:-0.015em;}
+.section-head p{color:var(--text-mid); margin-top:14px; font-size:15.5px; line-height:1.7;}
+
+.feat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+.feat-card{padding:26px; transition:transform .2s ease, border-color .2s ease;}
+.feat-card:hover{transform:translateY(-4px); border-color:rgba(0,229,168,0.35);}
+.feat-icon{width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; margin-bottom:18px;
+  background:var(--volt-dim); color:var(--volt);}
+.feat-card h4{font-size:16px; margin-bottom:8px;}
+.feat-card p{font-size:13.5px; color:var(--text-mid); line-height:1.6;}
+
+.logos-strip{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:28px; padding:30px 0; opacity:.75;}
+.logos-strip span{font-family:var(--disp); font-weight:600; font-size:15px; color:var(--text-low); letter-spacing:.02em;}
+
+.how-row{display:grid; grid-template-columns:repeat(4,1fr); gap:20px; counter-reset:step;}
+.how-step{padding:24px; position:relative;}
+.how-step .num{font-family:var(--mono); font-size:12px; color:var(--volt); margin-bottom:14px; display:block;}
+.how-step h4{font-size:15.5px; margin-bottom:8px;}
+.how-step p{font-size:13px; color:var(--text-mid); line-height:1.6;}
+
+.price-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+.price-card{padding:32px; position:relative;}
+.price-card.feat{border-color:rgba(0,229,168,0.45); background:linear-gradient(180deg, rgba(0,229,168,0.06), rgba(30,41,59,0.55));}
+.price-card .tag{position:absolute; top:-12px; right:24px; background:var(--volt); color:#052b21; font-size:11px; font-weight:700; padding:4px 12px; border-radius:999px; font-family:var(--mono);}
+.price-card h4{font-size:16px; color:var(--text-mid); font-weight:500; margin-bottom:14px;}
+.price-card .amt{font-family:var(--disp); font-size:38px; font-weight:700; margin-bottom:4px;}
+.price-card .amt span{font-size:14px; color:var(--text-low); font-weight:400;}
+.price-card ul{list-style:none; margin:24px 0 28px; display:flex; flex-direction:column; gap:12px;}
+.price-card li{font-size:13.5px; color:var(--text-mid); display:flex; gap:10px; align-items:flex-start;}
+.price-card li::before{content:'✓'; color:var(--volt); font-weight:700; flex-shrink:0;}
+
+.test-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+.test-card{padding:26px;}
+.test-card p{font-size:14.5px; color:var(--text-mid); line-height:1.7; margin-bottom:20px; font-style:italic;}
+.test-who{display:flex; gap:12px; align-items:center;}
+.test-avatar{width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--volt),var(--cyan)); flex-shrink:0;}
+.test-who b{font-size:13.5px; display:block;}
+.test-who span{font-size:12px; color:var(--text-low);}
+
+.faq-item{border-bottom:1px solid var(--panel-border); padding:22px 0; cursor:pointer;}
+.faq-q{display:flex; justify-content:space-between; align-items:center; font-size:15px; font-weight:600;}
+.faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease; font-size:13.5px; color:var(--text-mid); line-height:1.7;}
+.faq-item.open .faq-a{max-height:200px; margin-top:14px;}
+.faq-item .chev{transition:transform .3s ease; color:var(--volt);}
+.faq-item.open .chev{transform:rotate(45deg);}
+
+footer{border-top:1px solid var(--panel-border); padding:56px 0 28px;}
+.foot-grid{display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:32px; margin-bottom:44px;}
+.foot-col h5{font-size:13px; color:var(--text-hi); margin-bottom:16px; letter-spacing:.02em;}
+.foot-col a{display:block; font-size:13.5px; color:var(--text-mid); margin-bottom:11px;}
+.foot-col a:hover{color:var(--volt);}
+.foot-bottom{display:flex; justify-content:space-between; padding-top:24px; border-top:1px solid var(--panel-border); font-size:12.5px; color:var(--text-low);}
+.cta-band{padding:64px; text-align:center; margin:0 32px 88px; border-radius:24px; position:relative; overflow:hidden;
+  background:linear-gradient(135deg, rgba(0,229,168,0.12), rgba(0,194,255,0.06));}
+.cta-band h2{font-size:32px; margin-bottom:14px;}
+.cta-band p{color:var(--text-mid); margin-bottom:30px;}
+
+/* ===== AUTH ===== */
+#auth-view{display:none; min-height:100vh; align-items:center; justify-content:center; padding:40px;}
+.auth-box{width:420px; padding:38px; position:relative;}
+.role-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:18px 0 22px;}
+.role-opt{padding:12px; border:1px solid var(--panel-border); border-radius:10px; font-size:12.5px; text-align:center; color:var(--text-mid); transition:.15s;}
+.role-opt.active{border-color:var(--volt); background:var(--volt-dim); color:var(--volt); font-weight:600;}
+.field{margin-bottom:16px;}
+.field label{font-size:12.5px; color:var(--text-mid); display:block; margin-bottom:7px; font-weight:500;}
+.field input{width:100%; padding:12px 14px; border-radius:9px; background:rgba(255,255,255,0.03); border:1px solid var(--panel-border); color:var(--text-hi); font-size:14px; font-family:var(--body);}
+.field input:focus{outline:none; border-color:var(--volt);}
+.otp-row{display:flex; gap:8px;}
+.otp-row input{text-align:center; font-family:var(--mono); font-size:18px; width:100%;}
+.auth-switch{text-align:center; font-size:13px; color:var(--text-mid); margin-top:20px;}
+.auth-switch b{color:var(--volt); cursor:pointer;}
+
+/* ===== APP SHELL ===== */
+#app-view{min-height:100vh; grid-template-columns:250px 1fr;}
+.app-shell{display:grid; grid-template-columns:250px 1fr; min-height:100vh;}
+.sidebar{background:var(--bg-1); border-right:1px solid var(--panel-border); padding:22px 16px; display:flex; flex-direction:column;}
+.sb-logo{display:flex; align-items:center; gap:10px; padding:8px 10px 26px; font-family:var(--disp); font-weight:700; font-size:17px;}
+.sb-nav{display:flex; flex-direction:column; gap:3px; flex:1;}
+.sb-item{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:9px; font-size:13.5px; color:var(--text-mid); font-weight:500; transition:.15s;}
+.sb-item svg{width:17px; height:17px; flex-shrink:0;}
+.sb-item:hover{background:rgba(255,255,255,0.04); color:var(--text-hi);}
+.sb-item.active{background:var(--volt-dim); color:var(--volt);}
+.sb-foot{border-top:1px solid var(--panel-border); padding-top:14px; margin-top:10px; display:flex; align-items:center; gap:10px; padding:14px 10px 0;}
+.sb-foot .av{width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--volt),var(--cyan)); flex-shrink:0;}
+.sb-foot b{font-size:12.5px; display:block;}
+.sb-foot span{font-size:11px; color:var(--text-low);}
+
+.main{padding:26px 32px 60px; overflow-x:hidden;}
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:26px;}
+.topbar h2{font-size:22px;}
+.topbar .sub{font-size:13px; color:var(--text-low); margin-top:3px; font-weight:400; font-family:var(--body);}
+.topbar-right{display:flex; gap:12px; align-items:center;}
+.icon-btn{width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid var(--panel-border); display:flex; align-items:center; justify-content:center; color:var(--text-mid); position:relative;}
+.icon-btn .dot{position:absolute; top:6px; right:7px; width:6px; height:6px; border-radius:50%; background:var(--danger);}
+
+.view{display:none;}
+.view.active{display:block;}
+
+.kpi-row{display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:22px;}
+.kpi{padding:18px;}
+.kpi .lab{font-size:11.5px; color:var(--text-low); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;}
+.kpi .val{font-family:var(--mono); font-size:24px; font-weight:600;}
+.kpi .delta{font-size:11.5px; margin-top:6px; font-family:var(--mono);}
+.kpi .delta.pos{color:var(--volt);} .kpi .delta.neg{color:var(--danger);}
+
+.grid-2{display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-bottom:16px;}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:16px;}
+.panel{padding:20px;}
+.panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+.panel-head h3{font-size:14.5px; font-weight:600;}
+.panel-head .tag{font-size:11px; color:var(--text-low);}
+canvas{max-width:100%;}
+
+table{width:100%; border-collapse:collapse; font-size:13px;}
+th{text-align:left; padding:11px 12px; color:var(--text-low); font-weight:500; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--panel-border);}
+td{padding:13px 12px; border-bottom:1px solid rgba(148,163,184,0.08);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.015);}
+.veh-id{font-family:var(--mono); font-weight:600; font-size:12.5px;}
+.bar-bg{width:60px; height:6px; border-radius:4px; background:rgba(255,255,255,0.06); display:inline-block; overflow:hidden; vertical-align:middle; margin-right:8px;}
+.bar-fill{height:100%; border-radius:4px;}
+
+.filters-row{display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+.filters-row input, .filters-row select{padding:9px 14px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--panel-border); color:var(--text-hi); font-size:13px;}
+.filters-row input{flex:1; min-width:180px;}
+
+.ai-insight{display:flex; gap:12px; padding:13px; border-radius:10px; background:rgba(0,229,168,0.05); border:1px solid rgba(0,229,168,0.18); margin-bottom:10px;}
+.ai-insight .ic{width:26px; height:26px; border-radius:7px; background:var(--volt-dim); color:var(--volt); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px;}
+.ai-insight p{font-size:12.5px; color:var(--text-mid); line-height:1.55;}
+.ai-insight b{color:var(--text-hi);}
+
+.activity-item{display:flex; gap:12px; padding:11px 0; border-bottom:1px solid rgba(148,163,184,0.08); align-items:flex-start;}
+.activity-item:last-child{border:none;}
+.activity-item .dot2{width:7px; height:7px; border-radius:50%; margin-top:5px; flex-shrink:0;}
+.activity-item p{font-size:12.5px; color:var(--text-mid);}
+.activity-item p b{color:var(--text-hi); font-weight:600;}
+.activity-item span{font-size:11px; color:var(--text-low); display:block; margin-top:2px; font-family:var(--mono);}
+
+/* battery module */
+.gauge-wrap{display:flex; flex-direction:column; align-items:center; padding:12px 0;}
+.gauge-val{font-family:var(--mono); font-size:36px; font-weight:700; margin-top:-70px;}
+.gauge-lab{font-size:11.5px; color:var(--text-low); margin-top:4px;}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.slider-field label{display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-mid); margin-bottom:8px;}
+.slider-field label b{color:var(--text-hi); font-family:var(--mono);}
+.slider-field input[type=range]{width:100%; accent-color:var(--volt);}
+.reco-card{padding:14px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid var(--panel-border); margin-bottom:10px;}
+.reco-card .h{display:flex; justify-content:space-between; margin-bottom:6px;}
+.reco-card .h b{font-size:13px;}
+.reco-card p{font-size:12px; color:var(--text-mid); line-height:1.6;}
+
+/* procurement */
+.compare-table th, .compare-table td{text-align:center;}
+.compare-table td:first-child, .compare-table th:first-child{text-align:left;}
+.best{color:var(--volt); font-weight:700;}
+.oem-badge{display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:13px;}
+.oem-dot{width:9px; height:9px; border-radius:3px;}
+
+/* supply chain */
+.risk-map{display:grid; grid-template-columns:repeat(5,1fr); gap:8px;}
+.risk-cell{aspect-ratio:1; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-direction:column; font-size:10.5px; color:var(--text-mid);}
+.risk-cell b{font-family:var(--mono); font-size:15px; color:var(--text-hi); margin-bottom:2px;}
+
+/* copilot */
+.copilot-wrap{display:grid; grid-template-columns:280px 1fr; gap:16px; height:calc(100vh - 160px);}
+.copilot-suggest{display:flex; flex-direction:column; gap:8px;}
+.sugg-chip{padding:11px 13px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid var(--panel-border); font-size:12.5px; color:var(--text-mid); text-align:left;}
+.sugg-chip:hover{border-color:var(--volt); color:var(--text-hi);}
+.chat-panel{display:flex; flex-direction:column; padding:0; overflow:hidden;}
+.chat-log{flex:1; overflow-y:auto; padding:22px; display:flex; flex-direction:column; gap:16px;}
+.msg{max-width:78%; padding:13px 16px; border-radius:14px; font-size:13.5px; line-height:1.6;}
+.msg.bot{background:rgba(255,255,255,0.03); border:1px solid var(--panel-border); align-self:flex-start; border-bottom-left-radius:4px;}
+.msg.user{background:linear-gradient(90deg,var(--volt),#00c98f); color:#052b21; align-self:flex-end; border-bottom-right-radius:4px; font-weight:500;}
+.msg ul{margin:8px 0 0 18px;}
+.chat-input{display:flex; gap:10px; padding:16px; border-top:1px solid var(--panel-border);}
+.chat-input input{flex:1; padding:12px 16px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid var(--panel-border); color:var(--text-hi); font-size:13.5px;}
+.chat-input input:focus{outline:none; border-color:var(--volt);}
+.send-btn{width:44px; height:44px; border-radius:10px; background:var(--volt); color:#052b21; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+
+/* carbon */
+.tree-count{font-family:var(--mono); font-size:30px; font-weight:700; color:var(--volt);}
+
+/* svg charts */
+.svgchart{width:100%; display:block;}
+.svgchart svg{display:block;}
+.legend-row{display:flex; gap:16px; margin-top:10px; flex-wrap:wrap;}
+.legend-row span{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-mid);}
+.legend-row i{width:9px; height:9px; border-radius:3px; display:inline-block;}
+
+/* toast */
+#toastHost{position:fixed; bottom:26px; right:26px; z-index:999; display:flex; flex-direction:column; gap:10px;}
+.toast{padding:14px 18px; border-radius:10px; background:rgba(17,24,39,0.95); border:1px solid rgba(0,229,168,0.35); box-shadow:0 12px 30px -8px rgba(0,0,0,0.5); font-size:13px; display:flex; align-items:center; gap:10px; backdrop-filter:blur(12px); animation:toastIn .25s ease; max-width:340px;}
+.toast .tick{color:var(--volt); font-weight:700;}
+@keyframes toastIn{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+/* modal */
+#modalHost{position:fixed; inset:0; background:rgba(5,8,15,0.6); backdrop-filter:blur(4px); z-index:998; display:none; align-items:center; justify-content:center; padding:24px;}
+#modalHost.open{display:flex;}
+.modal-box{width:440px; max-width:100%; padding:28px; max-height:86vh; overflow-y:auto;}
+.modal-box h3{font-size:18px; margin-bottom:6px;}
+.modal-box .close-x{position:absolute; top:18px; right:20px; color:var(--text-low); font-size:18px; cursor:pointer;}
+.modal-box{position:relative;}
+.modal-actions{display:flex; gap:10px; margin-top:22px;}
+.modal-actions .btn{flex:1; justify-content:center;}
+
+/* notif dropdown */
+.notif-pop{position:absolute; top:48px; right:0; width:300px; padding:8px; z-index:60; display:none;}
+.notif-pop.open{display:block;}
+.notif-item{padding:10px 12px; border-radius:8px; font-size:12.5px; color:var(--text-mid);}
+.notif-item:hover{background:rgba(255,255,255,0.04);}
+.notif-item b{color:var(--text-hi); display:block; font-size:12.5px; margin-bottom:2px;}
+.topbar-right{position:relative;}
+
+/* fleet map view */
+.fleet-map{padding:20px; position:relative; min-height:420px;}
+.map-pin{position:absolute; width:12px; height:12px; border-radius:50%; border:2px solid var(--bg-0); cursor:pointer; transform:translate(-50%,-50%);}
+.map-hub-label{position:absolute; font-family:var(--mono); font-size:11px; color:var(--text-low); transform:translate(-50%,0);}
+
+@media (max-width:1100px){
+  .hero-grid{grid-template-columns:1fr;}
+  .feat-grid{grid-template-columns:repeat(2,1fr);}
+  .price-grid, .test-grid, .how-row{grid-template-columns:1fr 1fr;}
+  .kpi-row{grid-template-columns:repeat(3,1fr);}
+  .grid-2, .grid-3{grid-template-columns:1fr;}
+  .app-shell{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LANDING PAGE ============ -->
+<div id="landing-view">
+  <nav class="nav">
+    <div class="container">
+      <div class="logo">
+        <svg width="30" height="30" viewBox="0 0 30 30"><polygon points="15,1 27,8 27,22 15,29 3,22 3,8" fill="none" stroke="#00E5A8" stroke-width="1.6"/><path d="M17 7 L10 16 H14.5 L12.5 23 L21 12 H16 Z" fill="#00E5A8"/></svg>
+        VoltMind <span style="color:var(--volt)">AI</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Platform</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#testimonials">Customers</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="nav-cta">
+        <a class="btn btn-ghost" onclick="showAuth('login')">Sign in</a>
+        <a class="btn btn-primary" onclick="showAuth('signup')">Request Demo</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">ET AI HACKATHON 2026 · INDUSTRIAL EV INTELLIGENCE</div>
+        <h1>AI-Powered Industrial EV <span class="grad-text">Supply Chain &amp; Asset Intelligence</span></h1>
+        <p class="lede">VoltMind AI unifies fleet telemetry, battery health prediction, procurement intelligence, supply-chain risk and carbon accounting into one system of record — so industrial fleet operators can move to electric with confidence, not guesswork.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" onclick="showAuth('signup')">Request Demo →</a>
+          <a class="btn btn-ghost" onclick="enterApp()">Get Started</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><b>4,208</b><span>EVs under management</span></div>
+          <div class="hero-stat"><b>18.4K t</b><span>CO₂ saved YTD</span></div>
+          <div class="hero-stat"><b>99.2%</b><span>Predicted uptime</span></div>
+        </div>
+      </div>
+      <div class="dash-preview glass">
+        <div class="dash-preview-head">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="mono" style="font-size:11px;color:var(--text-low)">live fleet · updated 4s ago</span>
+        </div>
+        <div class="mini-cards">
+          <div class="mini-card"><div class="lab">Active EVs</div><div class="val">3,142</div></div>
+          <div class="mini-card"><div class="lab">Avg Battery</div><div class="val up">86%</div></div>
+          <div class="mini-card"><div class="lab">Alerts</div><div class="val" style="color:var(--warn)">7</div></div>
+        </div>
+        <div class="pulse-line"><div id="heroPulse" class="svgchart" style="height:90px"></div></div>
+        <div class="mini-cards" style="margin-top:10px;">
+          <div class="mini-card"><div class="lab">Charging Now</div><div class="val">214</div></div>
+          <div class="mini-card"><div class="lab">CO₂ Saved</div><div class="val up">18.4K t</div></div>
+          <div class="mini-card"><div class="lab">Net Zero</div><div class="val up">64%</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Platform</div>
+        <h2>Every layer of your EV transition, intelligent by default</h2>
+        <p>Not another dashboard — VoltMind reasons over your fleet, suppliers and energy data to tell you what to do next.</p>
+      </div>
+      <div class="feat-grid">
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-5A2 2 0 0 1 6.4 6.5h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.7"/><circle cx="17" cy="18.5" r="1.7"/></svg></div><h4>EV Fleet Management</h4><p>Live location, battery %, health and utilization across every vehicle in the fleet.</p></div>
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 10v4"/><path d="M8 12h4"/></svg></div><h4>Battery Health AI</h4><p>ML-driven degradation curves, remaining useful life, and replacement forecasting.</p></div>
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 1 5.4-5.4l-3 3-2-2z"/></svg></div><h4>Predictive Maintenance</h4><p>Catch faults before breakdown with health timelines and priority-ranked alerts.</p></div>
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div><h4>Procurement Intelligence</h4><p>Compare Tata, Mahindra, Ashok Leyland, Volvo Eicher on cost, range and ROI.</p></div>
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h4>Supply Chain Risk</h4><p>Track lithium, nickel, cobalt and LFP cell suppliers with live risk heatmaps.</p></div>
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><h4>Charging Infrastructure</h4><p>Station status, queueing, reservations and power draw across your network.</p></div>
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5-4 8-8 8-13a8 8 0 0 0-16 0c0 5 3 9 8 13z"/></svg></div><h4>Net Zero &amp; Carbon</h4><p>Scope 1 &amp; 2 tracking, CO₂ reduction, and auto-generated ESG reports.</p></div>
+        <div class="feat-card glass"><div class="feat-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="12" rx="2.5"/><path d="M9 21h6M9 17v4M15 17v4"/><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/></svg></div><h4>AI Copilot</h4><p>Ask "which vehicles should be replaced first?" in plain language, get a plan.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="logos-strip glass" style="padding:26px 40px;">
+        <span>TATA MOTORS</span><span>MAHINDRA ELECTRIC</span><span>ASHOK LEYLAND</span><span>VOLVO EICHER</span><span>JBM</span><span>AMAZON LOGISTICS</span><span>FLIPKART LOGISTICS</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Process</div>
+        <h2>From onboarding to net-zero fleet in four moves</h2>
+      </div>
+      <div class="how-row">
+        <div class="how-step glass"><span class="num">STEP 01</span><h4>Connect your fleet</h4><p>Onboard vehicles, telematics and charging infrastructure in a day, no hardware swap.</p></div>
+        <div class="how-step glass"><span class="num">STEP 02</span><h4>Baseline &amp; predict</h4><p>Models learn battery, usage and route patterns to set health and risk baselines.</p></div>
+        <div class="how-step glass"><span class="num">STEP 03</span><h4>Act on AI guidance</h4><p>Maintenance, procurement and supplier decisions come with a ranked recommendation.</p></div>
+        <div class="how-step glass"><span class="num">STEP 04</span><h4>Report &amp; scale</h4><p>Auto-generated ESG and board reports as you expand the electric fleet.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-head" style="margin:0 auto 52px; text-align:center;">
+        <div class="eyebrow" style="justify-content:center;">Pricing</div>
+        <h2>Plans built for fleet scale</h2>
+      </div>
+      <div class="price-grid">
+        <div class="price-card glass"><h4>Starter</h4><div class="amt">₹2.4L <span>/ month</span></div><ul><li>Up to 250 vehicles</li><li>Fleet &amp; battery dashboards</li><li>Email alerts</li><li>Standard reports</li></ul><a class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="showAuth('signup')">Start free trial</a></div>
+        <div class="price-card feat glass"><div class="tag">MOST POPULAR</div><h4>Enterprise</h4><div class="amt">₹8.9L <span>/ month</span></div><ul><li>Up to 5,000 vehicles</li><li>Predictive maintenance AI</li><li>Procurement &amp; supply chain intelligence</li><li>AI Copilot + ESG reporting</li></ul><a class="btn btn-primary" style="width:100%; justify-content:center;" onclick="showAuth('signup')">Request Demo</a></div>
+        <div class="price-card glass"><h4>Custom</h4><div class="amt">Talk to us</div><ul><li>Unlimited fleet size</li><li>Dedicated ML models</li><li>Custom integrations</li><li>On-prem / VPC deploy</li></ul><a class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="showAuth('signup')">Contact sales</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Customers</div>
+        <h2>Trusted by fleet and sustainability teams</h2>
+      </div>
+      <div class="test-grid">
+        <div class="test-card glass"><p>"VoltMind flagged three packs heading for early failure two weeks before we'd have caught it manually. That's real ROI."</p><div class="test-who"><div class="test-avatar"></div><div><b>Fleet Ops Director</b><span>Industrial Logistics, Bengaluru</span></div></div></div>
+        <div class="test-card glass"><p>"Procurement intelligence turned a three-week OEM comparison into a same-day decision with a defensible ROI model."</p><div class="test-who"><div class="test-avatar"></div><div><b>Procurement Manager</b><span>Regional Fleet Operator</span></div></div></div>
+        <div class="test-card glass"><p>"Our ESG report generation went from a quarterly scramble to a one-click export the board actually trusts."</p><div class="test-who"><div class="test-avatar"></div><div><b>Sustainability Officer</b><span>Manufacturing Group</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container" style="max-width:820px;">
+      <div class="section-head"><div class="eyebrow">FAQ</div><h2>Questions, answered</h2></div>
+      <div class="faq-list">
+        <div class="faq-item glass" style="padding:20px 24px;" onclick="this.classList.toggle('open')"><div class="faq-q">How does battery health prediction work? <span class="chev">+</span></div><div class="faq-a">Models ingest charging cycles, temperature, usage patterns and fast-charge frequency to output a health score, remaining useful life and a replacement risk band.</div></div>
+        <div class="faq-item glass" style="padding:20px 24px;" onclick="this.classList.toggle('open')"><div class="faq-q">Can VoltMind integrate with our existing telematics? <span class="chev">+</span></div><div class="faq-a">Yes — VoltMind ingests standard telematics and charger protocols and layers AI intelligence on top without replacing your hardware.</div></div>
+        <div class="faq-item glass" style="padding:20px 24px;" onclick="this.classList.toggle('open')"><div class="faq-q">Is our fleet and supplier data secure? <span class="chev">+</span></div><div class="faq-a">Role-based access, encrypted storage and audit trails are built in, with optional on-prem / VPC deployment for enterprise customers.</div></div>
+        <div class="faq-item glass" style="padding:20px 24px;" onclick="this.classList.toggle('open')"><div class="faq-q">Do you support multi-OEM fleets? <span class="chev">+</span></div><div class="faq-a">Yes — procurement intelligence and fleet monitoring both work across mixed OEM fleets including Tata, Mahindra, Ashok Leyland and Volvo Eicher.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-band glass">
+    <h2>Ready to make your EV transition intelligent?</h2>
+    <p>Join industrial fleets already cutting downtime and emissions with VoltMind AI.</p>
+    <a class="btn btn-primary" onclick="showAuth('signup')">Request a Demo →</a>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="foot-grid">
+        <div class="foot-col">
+          <div class="logo" style="margin-bottom:14px;">
+            <svg width="26" height="26" viewBox="0 0 30 30"><polygon points="15,1 27,8 27,22 15,29 3,22 3,8" fill="none" stroke="#00E5A8" stroke-width="1.6"/><path d="M17 7 L10 16 H14.5 L12.5 23 L21 12 H16 Z" fill="#00E5A8"/></svg>
+            VoltMind AI
+          </div>
+          <p style="font-size:13px; color:var(--text-low); line-height:1.7; max-width:220px;">Driving intelligent EV operations towards net zero.</p>
+        </div>
+        <div class="foot-col"><h5>Platform</h5><a>Fleet Management</a><a>Battery Health AI</a><a>Predictive Maintenance</a><a>AI Copilot</a></div>
+        <div class="foot-col"><h5>Solutions</h5><a>Procurement</a><a>Supply Chain Risk</a><a>Charging Network</a><a>Carbon &amp; ESG</a></div>
+        <div class="foot-col"><h5>Company</h5><a>About</a><a>Careers</a><a>Press</a><a>Contact</a></div>
+        <div class="foot-col"><h5>Resources</h5><a>Documentation</a><a>API</a><a>Security</a><a>Status</a></div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 VoltMind AI. Built for ET AI Hackathon 2026 by <b style="color:var(--text-mid)">Bhargavi N</b>.</span>
+        <span>Privacy · Terms · Security</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ============ AUTH ============ -->
+<div id="auth-view">
+  <div class="auth-box glass">
+    <div class="logo" style="margin-bottom:6px;">
+      <svg width="26" height="26" viewBox="0 0 30 30"><polygon points="15,1 27,8 27,22 15,29 3,22 3,8" fill="none" stroke="#00E5A8" stroke-width="1.6"/><path d="M17 7 L10 16 H14.5 L12.5 23 L21 12 H16 Z" fill="#00E5A8"/></svg>
+      VoltMind AI
+    </div>
+
+    <div id="auth-login">
+      <h3 style="margin:18px 0 4px; font-size:20px;">Sign in to your workspace</h3>
+      <p style="font-size:13px; color:var(--text-low); margin-bottom:20px;">Role-based access for your team.</p>
+      <div class="role-grid">
+        <div class="role-opt active" data-role="Admin" onclick="pickRole(this)">Admin</div>
+        <div class="role-opt" data-role="Fleet Manager" onclick="pickRole(this)">Fleet Manager</div>
+        <div class="role-opt" data-role="Maintenance Engineer" onclick="pickRole(this)">Maintenance Engineer</div>
+        <div class="role-opt" data-role="Procurement Manager" onclick="pickRole(this)">Procurement Manager</div>
+      </div>
+      <div class="field"><label>Work email</label><input type="email" placeholder="you@company.com" value="admin@tatamotors.com"></div>
+      <div class="field"><label>Password</label><input type="password" placeholder="••••••••" value="••••••••••"></div>
+      <a class="btn btn-primary" style="width:100%; justify-content:center; margin-top:6px;" onclick="showAuth('otp')">Sign in →</a>
+      <p class="auth-switch">Forgot password? <b onclick="showAuth('forgot')">Reset it</b></p>
+      <p class="auth-switch">No account? <b onclick="showAuth('signup')">Create one</b></p>
+    </div>
+
+    <div id="auth-signup" style="display:none;">
+      <h3 style="margin:18px 0 4px; font-size:20px;">Request your demo workspace</h3>
+      <p style="font-size:13px; color:var(--text-low); margin-bottom:20px;">Set up VoltMind AI for your fleet.</p>
+      <div class="field"><label>Full name</label><input placeholder="Ananya Rao"></div>
+      <div class="field"><label>Company</label><input placeholder="Tata Motors Fleet Division"></div>
+      <div class="field"><label>Work email</label><input type="email" placeholder="you@company.com"></div>
+      <div class="field"><label>Fleet size</label><input placeholder="e.g. 250 vehicles"></div>
+      <a class="btn btn-primary" style="width:100%; justify-content:center; margin-top:6px;" onclick="showAuth('otp')">Create account →</a>
+      <p class="auth-switch">Already have an account? <b onclick="showAuth('login')">Sign in</b></p>
+    </div>
+
+    <div id="auth-forgot" style="display:none;">
+      <h3 style="margin:18px 0 4px; font-size:20px;">Reset your password</h3>
+      <p style="font-size:13px; color:var(--text-low); margin-bottom:20px;">We'll send a reset link to your work email.</p>
+      <div class="field"><label>Work email</label><input type="email" placeholder="you@company.com"></div>
+      <a class="btn btn-primary" style="width:100%; justify-content:center; margin-top:6px;" onclick="showAuth('otp')">Send reset link →</a>
+      <p class="auth-switch"><b onclick="showAuth('login')">← Back to sign in</b></p>
+    </div>
+
+    <div id="auth-otp" style="display:none;">
+      <h3 style="margin:18px 0 4px; font-size:20px;">Verify it's you</h3>
+      <p style="font-size:13px; color:var(--text-low); margin-bottom:20px;">Enter the 6-digit code sent to your registered device.</p>
+      <div class="otp-row" style="margin-bottom:22px;">
+        <input class="glass" maxlength="1" value="4"><input class="glass" maxlength="1" value="1"><input class="glass" maxlength="1" value="0"><input class="glass" maxlength="1" value="9"><input class="glass" maxlength="1" value="2"><input class="glass" maxlength="1" value="6">
+      </div>
+      <a class="btn btn-primary" style="width:100%; justify-content:center;" onclick="enterApp()">Verify &amp; continue →</a>
+      <p class="auth-switch">Didn't get a code? <b onclick="toast('Verification code resent')">Resend</b></p>
+    </div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+<div id="modalHost">
+  <div class="modal-box glass">
+    <span class="close-x" onclick="closeModal()">✕</span>
+    <h3 id="modalTitle">Title</h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app-view">
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg width="24" height="24" viewBox="0 0 30 30"><polygon points="15,1 27,8 27,22 15,29 3,22 3,8" fill="none" stroke="#00E5A8" stroke-width="1.6"/><path d="M17 7 L10 16 H14.5 L12.5 23 L21 12 H16 Z" fill="#00E5A8"/></svg>
+      VoltMind
+    </div>
+    <nav class="sb-nav" id="sbNav">
+      <a class="sb-item active" data-view="dashboard" onclick="nav('dashboard',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</a>
+      <a class="sb-item" data-view="fleet" onclick="nav('fleet',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 13l1.5-5A2 2 0 0 1 6.4 6.5h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.7"/><circle cx="17" cy="18.5" r="1.7"/></svg>Fleet Management</a>
+      <a class="sb-item" data-view="battery" onclick="nav('battery',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 10v4" stroke-linecap="round"/><path d="M8 12h4" stroke-linecap="round"/></svg>Battery Health AI</a>
+      <a class="sb-item" data-view="maintenance" onclick="nav('maintenance',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 1 5.4-5.4l-3 3-2-2z"/></svg>Predictive Maintenance</a>
+      <a class="sb-item" data-view="procurement" onclick="nav('procurement',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8L12 3 3 8l9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>Procurement</a>
+      <a class="sb-item" data-view="supply" onclick="nav('supply',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Supply Chain Risk</a>
+      <a class="sb-item" data-view="charging" onclick="nav('charging',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>Charging Network</a>
+      <a class="sb-item" data-view="carbon" onclick="nav('carbon',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5-4 8-8 8-13a8 8 0 0 0-16 0c0 5 3 9 8 13z"/></svg>Net Zero &amp; Carbon</a>
+      <a class="sb-item" data-view="copilot" onclick="nav('copilot',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="12" rx="2.5"/><path d="M9 21h6M9 17v4M15 17v4"/><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/></svg>AI Copilot</a>
+      <a class="sb-item" data-view="reports" onclick="nav('reports',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h6"/></svg>Reports</a>
+      <a class="sb-item" data-view="admin" onclick="nav('admin',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>Admin Panel</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="av"></div>
+      <div><b id="sbRoleName">Ananya Rao</b><span id="sbRoleTag">Admin</span></div>
+    </div>
+    <a onclick="backToLanding()" style="font-size:12px; color:var(--text-low); padding:14px 10px 0; display:block;">← Exit prototype</a>
+    <div style="font-size:10.5px; color:var(--text-low); opacity:.7; padding:10px 10px 0; font-family:var(--mono);">Built by Bhargavi N</div>
+  </aside>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="topbar">
+        <div><h2>Fleet Overview</h2><div class="sub">Real-time view across all connected sites · Bengaluru, Pune, Chennai hubs</div></div>
+        <div class="topbar-right">
+          <button class="icon-btn" id="notifBtn" onclick="toggleNotif()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot"></span></button>
+          <div class="notif-pop glass" id="notifPop">
+            <div class="notif-item"><b>Battery thermal anomaly</b>MH-14-EV-2291 flagged · 2 min ago</div>
+            <div class="notif-item"><b>Maintenance due</b>TN-09-EV-0654 brake service · 1 hr ago</div>
+            <div class="notif-item"><b>Supplier risk update</b>Glencore (Cobalt) score dropped to 54 · 3 hrs ago</div>
+            <div class="notif-item"><b>ESG report ready</b>Monthly report generated · 2 hrs ago</div>
+          </div>
+          <a class="btn btn-primary" style="padding:10px 18px; font-size:13px;" onclick="openAddVehicle()">+ Add Vehicle</a>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi glass"><div class="lab">Total Vehicles</div><div class="val">4,208</div><div class="delta pos">↑ 6.2% MoM</div></div>
+        <div class="kpi glass"><div class="lab">Active EVs</div><div class="val">3,142</div><div class="delta pos">↑ 74.7% of fleet</div></div>
+        <div class="kpi glass"><div class="lab">Avg Battery Health</div><div class="val">86.4%</div><div class="delta pos">↑ 1.1 pts</div></div>
+        <div class="kpi glass"><div class="lab">Charging Sessions</div><div class="val">1,864</div><div class="delta pos">↑ 12% today</div></div>
+        <div class="kpi glass"><div class="lab">CO₂ Saved (YTD)</div><div class="val">18.4K t</div><div class="delta pos">↑ 3.4K t</div></div>
+        <div class="kpi glass"><div class="lab">Maintenance Alerts</div><div class="val" style="color:var(--warn)">27</div><div class="delta neg">↑ 4 new</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel glass"><div class="panel-head"><h3>Fleet Utilization</h3><span class="tag">Last 14 days</span></div><div id="chartUtil" class="svgchart" style="height:170px"></div></div>
+        <div class="panel glass"><div class="panel-head"><h3>AI Insights</h3><span class="tag mono" style="color:var(--volt)">● live</span></div>
+          <div class="ai-insight"><div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg></div><p><b>12 vehicles</b> in the Chennai hub show accelerated battery degradation from fast-charge overuse. Recommend charge-speed cap.</p></div>
+          <div class="ai-insight"><div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div><p>Energy cost per km is <b>trending 8% lower</b> after the Pune depot's off-peak charging shift.</p></div>
+          <div class="ai-insight"><div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 1 5.4-5.4l-3 3-2-2z"/></svg></div><p><b>4 vehicles</b> predicted to need brake service within 9 days based on wear telemetry.</p></div>
+          <div class="ai-insight"><div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5-4 8-8 8-13a8 8 0 0 0-16 0c0 5 3 9 8 13z"/></svg></div><p>Fleet is tracking <b>3.2% ahead</b> of its Q3 net-zero milestone.</p></div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="panel glass"><div class="panel-head"><h3>Battery Health Trend</h3></div><div id="chartBattTrend" class="svgchart" style="height:140px"></div></div>
+        <div class="panel glass"><div class="panel-head"><h3>Energy Consumption</h3></div><div id="chartEnergy" class="svgchart" style="height:140px"></div></div>
+        <div class="panel glass"><div class="panel-head"><h3>Carbon Reduction</h3></div><div id="chartCarbonSmall" class="svgchart" style="height:140px"></div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel glass"><div class="panel-head"><h3>Charging Analytics</h3><span class="tag">By hub</span></div><div id="chartCharging" class="svgchart" style="height:170px"></div></div>
+        <div class="panel glass"><div class="panel-head"><h3>Recent Activity</h3></div>
+          <div class="activity-item"><div class="dot2" style="background:var(--warn)"></div><p><b>MH-14-EV-2291</b> flagged for battery temperature anomaly</p><span>2 min ago · Pune Hub</span></div>
+          <div class="activity-item"><div class="dot2" style="background:var(--volt)"></div><p><b>KA-05-EV-1187</b> completed fast-charge session — 92% SoC</p><span>11 min ago · Bengaluru Hub</span></div>
+          <div class="activity-item"><div class="dot2" style="background:var(--cyan)"></div><p>Procurement AI recommended <b>Tata Ace EV</b> for 40-unit refresh</p><span>34 min ago · Procurement</span></div>
+          <div class="activity-item"><div class="dot2" style="background:var(--danger)"></div><p><b>TN-09-EV-0654</b> predictive maintenance: brake service due</p><span>1 hr ago · Chennai Hub</span></div>
+          <div class="activity-item"><div class="dot2" style="background:var(--volt)"></div><p>Monthly ESG report generated and sent to Sustainability team</p><span>2 hrs ago · Reports</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLEET MANAGEMENT -->
+    <div class="view" id="view-fleet">
+      <div class="topbar"><div><h2>EV Fleet Management</h2><div class="sub">4,208 vehicles across 3 hubs</div></div>
+        <div class="topbar-right"><a class="btn btn-ghost" style="padding:10px 16px;font-size:13px;" onclick="toggleMapView(this)">Map View</a><a class="btn btn-primary" style="padding:10px 18px;font-size:13px;" onclick="openAddVehicle()">+ Add Vehicle</a></div></div>
+      <div class="filters-row">
+        <input id="fleetSearch" placeholder="Search by vehicle ID or hub..." oninput="filterFleet()">
+        <select id="fleetStatusFilter" onchange="filterFleet()"><option value="">All Status</option><option>Active</option><option>Charging</option><option>Idle</option><option>In Service</option></select>
+        <select id="fleetHubFilter" onchange="filterFleet()"><option value="">All Hubs</option><option>Bengaluru</option><option>Pune</option><option>Chennai</option></select>
+        <select id="fleetHealthFilter" onchange="filterFleet()"><option value="">All Health</option><option>Good</option><option>Watch</option><option>Critical</option></select>
+      </div>
+      <div class="panel glass" style="padding:0;" id="fleetTableWrap">
+        <table id="fleetTable">
+          <thead><tr><th>Vehicle</th><th>Location</th><th>Battery</th><th>Health</th><th>Mileage</th><th>Temp</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="fleetMapWrap" style="display:none;"></div>
+    </div>
+
+    <!-- BATTERY HEALTH -->
+    <div class="view" id="view-battery">
+      <div class="topbar"><div><h2>AI Battery Health Intelligence</h2><div class="sub">Predict degradation before it costs you a vehicle</div></div></div>
+      <div class="grid-2">
+        <div class="panel glass">
+          <div class="panel-head"><h3>Simulate Battery Profile — MH-14-EV-2291</h3><span class="tag">Tata Ace EV · 14 months in service</span></div>
+          <div class="form-grid">
+            <div class="slider-field"><label>Charging Cycles / month <b id="v1">312</b></label><input type="range" min="50" max="600" value="312" oninput="document.getElementById('v1').innerText=this.value; updateBattery()"></div>
+            <div class="slider-field"><label>Avg Operating Temp (°C) <b id="v2">34</b></label><input type="range" min="15" max="55" value="34" oninput="document.getElementById('v2').innerText=this.value; updateBattery()"></div>
+            <div class="slider-field"><label>Daily Usage (km) <b id="v3">142</b></label><input type="range" min="20" max="350" value="142" oninput="document.getElementById('v3').innerText=this.value; updateBattery()"></div>
+            <div class="slider-field"><label>Fast-Charge Frequency (%) <b id="v4">46</b></label><input type="range" min="0" max="100" value="46" oninput="document.getElementById('v4').innerText=this.value; updateBattery()"></div>
+          </div>
+          <div style="margin-top:20px;"><div id="chartBattProject" class="svgchart" style="height:180px"></div></div>
+        </div>
+        <div class="panel glass">
+          <div class="panel-head"><h3>AI Prediction Output</h3></div>
+          <div class="gauge-wrap"><div id="gaugeChart" style="width:220px;height:130px"></div><div class="gauge-val" id="gaugeVal" style="color:var(--volt)">82%</div><div class="gauge-lab">Battery Health Score</div></div>
+          <div style="display:flex; justify-content:space-between; margin:18px 0; text-align:center;">
+            <div><div class="mono" id="rulVal" style="font-size:19px; font-weight:700;">3.4 yrs</div><div style="font-size:11px;color:var(--text-low)">Remaining Useful Life</div></div>
+            <div><div class="mono" style="font-size:19px; font-weight:700;" id="riskVal">Moderate</div><div style="font-size:11px;color:var(--text-low)">Risk Level</div></div>
+          </div>
+          <div class="reco-card"><div class="h"><b>Reduce fast-charge frequency</b><span class="pill pill-warn">High Impact</span></div><p>Cutting fast-charge use below 30% could extend RUL by an estimated 8 months.</p></div>
+          <div class="reco-card"><div class="h"><b>Schedule thermal inspection</b><span class="pill pill-info">Medium Impact</span></div><p>Operating temp trending above the optimal 25–30°C band for this pack chemistry.</p></div>
+          <div class="reco-card"><div class="h"><b>Plan replacement window</b><span class="pill pill-ok">Low Urgency</span></div><p>Budget for pack replacement in FY28 Q1 based on current degradation slope.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAINTENANCE -->
+    <div class="view" id="view-maintenance">
+      <div class="topbar"><div><h2>Predictive Maintenance</h2><div class="sub">Fault detection before breakdown</div></div></div>
+      <div class="grid-3">
+        <div class="kpi glass"><div class="lab">Upcoming Service (7 days)</div><div class="val">18</div></div>
+        <div class="kpi glass"><div class="lab">Critical Alerts</div><div class="val" style="color:var(--danger)">5</div></div>
+        <div class="kpi glass"><div class="lab">Predicted Uptime</div><div class="val" style="color:var(--volt)">99.2%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel glass"><div class="panel-head"><h3>Health Timeline — Fleet-wide</h3></div><div id="chartMaintTimeline" class="svgchart" style="height:180px"></div></div>
+        <div class="panel glass"><div class="panel-head"><h3>AI Alerts by Priority</h3></div>
+          <div class="reco-card" style="border-left:3px solid var(--danger)"><div class="h"><b>TN-09-EV-0654 — Brake wear critical</b><span class="pill pill-danger">Critical</span></div><p>Predicted failure in 3 days. Schedule immediate service.</p></div>
+          <div class="reco-card" style="border-left:3px solid var(--warn)"><div class="h"><b>KA-05-EV-1187 — Coolant pressure drop</b><span class="pill pill-warn">High</span></div><p>Predicted issue within 9 days based on telemetry drift.</p></div>
+          <div class="reco-card" style="border-left:3px solid var(--warn)"><div class="h"><b>MH-14-EV-2291 — Battery thermal anomaly</b><span class="pill pill-warn">High</span></div><p>Recommend thermal inspection within 2 weeks.</p></div>
+          <div class="reco-card" style="border-left:3px solid var(--cyan)"><div class="h"><b>PB-03-EV-0912 — Tire wear uneven</b><span class="pill pill-info">Medium</span></div><p>Rotation recommended at next scheduled service.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROCUREMENT -->
+    <div class="view" id="view-procurement">
+      <div class="topbar"><div><h2>Procurement Intelligence</h2><div class="sub">Compare OEMs for your next 40-unit refresh</div></div>
+        <a class="btn btn-primary" style="padding:10px 18px;font-size:13px;" onclick="openROICalc()">Run ROI Calculator</a></div>
+      <div class="panel glass" style="padding:0; margin-bottom:16px;">
+        <table class="compare-table">
+          <thead><tr><th>Manufacturer</th><th>Price (₹)</th><th>Delivery</th><th>Battery</th><th>Range (km)</th><th>Charging Time</th><th>Warranty</th></tr></thead>
+          <tbody>
+            <tr><td><span class="oem-badge"><span class="oem-dot" style="background:#00E5A8"></span>Tata Ace EV</span></td><td class="mono best">18.5L</td><td class="mono">6 wks</td><td class="mono">40 kWh</td><td class="mono best">220</td><td class="mono">55 min</td><td class="mono">3 yr / 1.6L km</td></tr>
+            <tr><td><span class="oem-badge"><span class="oem-dot" style="background:#38BDF8"></span>Mahindra eSupro</span></td><td class="mono">17.9L</td><td class="mono best">4 wks</td><td class="mono">35 kWh</td><td class="mono">190</td><td class="mono best">45 min</td><td class="mono">3 yr / 1.5L km</td></tr>
+            <tr><td><span class="oem-badge"><span class="oem-dot" style="background:#FBBF24"></span>Ashok Leyland eDost</td><td class="mono">21.2L</td><td class="mono">8 wks</td><td class="mono best">55 kWh</td><td class="mono">260</td><td class="mono">70 min</td><td class="mono best">4 yr / 2L km</td></tr>
+            <tr><td><span class="oem-badge"><span class="oem-dot" style="background:#FB7185"></span>Volvo Eicher Pro</td><td class="mono">26.4L</td><td class="mono">10 wks</td><td class="mono">60 kWh</td><td class="mono">240</td><td class="mono">65 min</td><td class="mono">4 yr / 2L km</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid-3">
+        <div class="panel glass"><div class="panel-head"><h3>AI Recommendation</h3><span class="pill pill-ok">Best Value</span></div><p style="font-size:13px; color:var(--text-mid); line-height:1.7;"><b style="color:var(--text-hi)">Tata Ace EV</b> offers the strongest cost-to-range ratio for last-mile routes under 200km/day, with the fastest fleet-wide parts availability.</p></div>
+        <div class="panel glass"><div class="panel-head"><h3>Lowest Total Cost</h3><span class="pill pill-info">3-yr TCO</span></div><p style="font-size:13px; color:var(--text-mid); line-height:1.7;"><b style="color:var(--text-hi)">Mahindra eSupro</b> — lowest upfront + fastest delivery, ideal for rapid fleet scaling on tighter routes.</p></div>
+        <div class="panel glass"><div class="panel-head"><h3>Highest Efficiency</h3><span class="pill pill-warn">Long-haul</span></div><p style="font-size:13px; color:var(--text-mid); line-height:1.7;"><b style="color:var(--text-hi)">Ashok Leyland eDost</b> — best range and warranty coverage for high-utilization, longer-distance routes.</p></div>
+      </div>
+    </div>
+
+    <!-- SUPPLY CHAIN -->
+    <div class="view" id="view-supply">
+      <div class="topbar"><div><h2>Supply Chain Risk Intelligence</h2><div class="sub">Raw material &amp; supplier monitoring</div></div></div>
+      <div class="grid-2">
+        <div class="panel glass"><div class="panel-head"><h3>Supplier Risk Heatmap</h3><span class="tag">By material</span></div>
+          <div class="risk-map" id="riskMap"></div>
+        </div>
+        <div class="panel glass"><div class="panel-head"><h3>Delivery Delay Prediction</h3></div><div id="chartDelay" class="svgchart" style="height:180px"></div></div>
+      </div>
+      <div class="panel glass" style="padding:0;">
+        <table>
+          <thead><tr><th>Supplier</th><th>Material</th><th>Country</th><th>Score</th><th>Delay Risk</th><th>Alternative</th></tr></thead>
+          <tbody>
+            <tr><td>Ganfeng Lithium</td><td>Lithium</td><td>China</td><td class="mono">72</td><td><span class="pill pill-warn">Medium</span></td><td>Albemarle Corp</td></tr>
+            <tr><td>Vale S.A.</td><td>Nickel</td><td>Brazil</td><td class="mono">85</td><td><span class="pill pill-ok">Low</span></td><td>Norilsk Nickel</td></tr>
+            <tr><td>Glencore</td><td>Cobalt</td><td>DRC</td><td class="mono">54</td><td><span class="pill pill-danger">High</span></td><td>Umicore</td></tr>
+            <tr><td>CATL</td><td>LFP Cells</td><td>China</td><td class="mono">79</td><td><span class="pill pill-warn">Medium</span></td><td>BYD FinDreams</td></tr>
+            <tr><td>Exide Energy</td><td>LFP Cells</td><td>India</td><td class="mono">91</td><td><span class="pill pill-ok">Low</span></td><td>Amara Raja</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHARGING -->
+    <div class="view" id="view-charging">
+      <div class="topbar"><div><h2>Charging Station Management</h2><div class="sub">42 stations · 3 hubs</div></div></div>
+      <div class="grid-3">
+        <div class="kpi glass"><div class="lab">Stations Online</div><div class="val" style="color:var(--volt)">40/42</div></div>
+        <div class="kpi glass"><div class="lab">Vehicles Queued</div><div class="val">11</div></div>
+        <div class="kpi glass"><div class="lab">Power Draw (Live)</div><div class="val">2.4 MW</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel glass"><div class="panel-head"><h3>Station Status</h3></div>
+          <table><thead><tr><th>Station</th><th>Hub</th><th>Type</th><th>Queue</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">CHG-BLR-04</td><td>Bengaluru</td><td>Fast (120kW)</td><td class="mono">2</td><td><span class="pill pill-ok">Available</span></td></tr>
+            <tr><td class="mono">CHG-PUN-11</td><td>Pune</td><td>Fast (150kW)</td><td class="mono">0</td><td><span class="pill pill-ok">Available</span></td></tr>
+            <tr><td class="mono">CHG-CHN-02</td><td>Chennai</td><td>Standard (50kW)</td><td class="mono">5</td><td><span class="pill pill-warn">Busy</span></td></tr>
+            <tr><td class="mono">CHG-BLR-07</td><td>Bengaluru</td><td>Fast (120kW)</td><td class="mono">0</td><td><span class="pill pill-danger">Offline</span></td></tr>
+          </tbody></table>
+        </div>
+        <div class="panel glass"><div class="panel-head"><h3>Charging Load — 24h</h3></div><div id="chartLoad" class="svgchart" style="height:180px"></div></div>
+      </div>
+    </div>
+
+    <!-- CARBON -->
+    <div class="view" id="view-carbon">
+      <div class="topbar"><div><h2>Net Zero &amp; Carbon Intelligence</h2><div class="sub">FY26 progress against science-based target</div></div>
+        <a class="btn btn-primary" style="padding:10px 18px;font-size:13px;" onclick="downloadESG()">Download ESG Report</a></div>
+      <div class="grid-3">
+        <div class="kpi glass"><div class="lab">Scope 1 Emissions</div><div class="val">4.1K t</div><div class="delta pos">↓ 18% YoY</div></div>
+        <div class="kpi glass"><div class="lab">Scope 2 Emissions</div><div class="val">2.6K t</div><div class="delta pos">↓ 11% YoY</div></div>
+        <div class="kpi glass"><div class="lab">Net Zero Progress</div><div class="val" style="color:var(--volt)">64%</div><div class="delta pos">On track for FY29</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel glass"><div class="panel-head"><h3>CO₂ Reduction Trajectory</h3></div><div id="chartCO2" class="svgchart" style="height:180px"></div></div>
+        <div class="panel glass" style="text-align:center; padding-top:34px;">
+          <div class="panel-head" style="justify-content:center;"><h3>Equivalent Trees Planted</h3></div>
+          <div class="tree-count" style="display:flex;align-items:center;justify-content:center;gap:10px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5-4 8-8 8-13a8 8 0 0 0-16 0c0 5 3 9 8 13z"/><path d="M12 22V12"/></svg> 306,700</div>
+          <p style="font-size:12.5px; color:var(--text-low); margin-top:8px;">Based on 18.4K tonnes CO₂ saved YTD</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- COPILOT -->
+    <div class="view" id="view-copilot">
+      <div class="topbar"><div><h2>AI Copilot</h2><div class="sub">Ask VoltMind anything about your fleet</div></div></div>
+      <div class="copilot-wrap">
+        <div class="panel glass copilot-suggest">
+          <b style="font-size:12.5px; color:var(--text-low); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; display:block;">Try asking</b>
+          <button class="sugg-chip" onclick="askCopilot('Which vehicles should be replaced first?')">Which vehicles should be replaced first?</button>
+          <button class="sugg-chip" onclick="askCopilot('Which supplier has highest risk?')">Which supplier has highest risk?</button>
+          <button class="sugg-chip" onclick="askCopilot('Predict maintenance next month')">Predict maintenance next month</button>
+          <button class="sugg-chip" onclick="askCopilot('How can I reduce emissions?')">How can I reduce emissions?</button>
+          <button class="sugg-chip" onclick="askCopilot('Generate fleet report')">Generate fleet report</button>
+          <button class="sugg-chip" onclick="askCopilot('Why is battery health decreasing?')">Why is battery health decreasing?</button>
+        </div>
+        <div class="panel glass chat-panel">
+          <div class="chat-log" id="chatLog">
+            <div class="msg bot">Hi Ananya — I'm the VoltMind Copilot. I can reason over fleet, battery, procurement and supply-chain data. What would you like to know?</div>
+          </div>
+          <div class="chat-input">
+            <input id="chatInput" placeholder="Ask about your fleet, battery health, suppliers..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="send-btn" onclick="sendChat()">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="view" id="view-reports">
+      <div class="topbar"><div><h2>Reports</h2><div class="sub">Export &amp; scheduled reporting</div></div></div>
+      <div class="panel glass" style="padding:0;">
+        <table>
+          <thead><tr><th>Report</th><th>Type</th><th>Period</th><th>Generated</th><th>Export</th></tr></thead>
+          <tbody>
+            <tr><td>Monthly Fleet Summary</td><td>Fleet</td><td>Jun 2026</td><td class="mono">Jul 1, 2026</td><td><span class="pill pill-info" onclick="exportReport('Monthly Fleet Summary','PDF')" style="cursor:pointer">PDF</span> <span class="pill pill-info" onclick="exportReport('Monthly Fleet Summary','Excel')" style="cursor:pointer">Excel</span></td></tr>
+            <tr><td>Battery Health Report</td><td>Battery</td><td>Q2 2026</td><td class="mono">Jul 3, 2026</td><td><span class="pill pill-info" onclick="exportReport('Battery Health Report','PDF')" style="cursor:pointer">PDF</span></td></tr>
+            <tr><td>Carbon &amp; ESG Report</td><td>Carbon</td><td>FY26 H1</td><td class="mono">Jul 8, 2026</td><td><span class="pill pill-info" onclick="downloadESG()" style="cursor:pointer">PDF</span> <span class="pill pill-info" onclick="exportReport('Carbon ESG Report','CSV')" style="cursor:pointer">CSV</span></td></tr>
+            <tr><td>Procurement Comparison</td><td>Procurement</td><td>Jul 2026</td><td class="mono">Jul 15, 2026</td><td><span class="pill pill-info" onclick="exportReport('Procurement Comparison','Excel')" style="cursor:pointer">Excel</span></td></tr>
+            <tr><td>Maintenance Log</td><td>Maintenance</td><td>Jun 2026</td><td class="mono">Jul 1, 2026</td><td><span class="pill pill-info" onclick="exportReport('Maintenance Log','CSV')" style="cursor:pointer">CSV</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="view" id="view-admin">
+      <div class="topbar"><div><h2>Admin Panel</h2><div class="sub">Users, permissions &amp; system config</div></div>
+        <a class="btn btn-primary" style="padding:10px 18px;font-size:13px;" onclick="openInviteUser()">+ Invite User</a></div>
+      <div class="panel glass" style="padding:0;">
+        <table>
+          <thead><tr><th>User</th><th>Role</th><th>Hub</th><th>Status</th><th>Last Active</th></tr></thead>
+          <tbody id="adminUserTable">
+            <tr><td>Ananya Rao</td><td>Admin</td><td>All Hubs</td><td><span class="pill pill-ok">Active</span></td><td class="mono">Now</td></tr>
+            <tr><td>Rahul Mehta</td><td>Fleet Manager</td><td>Bengaluru</td><td><span class="pill pill-ok">Active</span></td><td class="mono">14 min ago</td></tr>
+            <tr><td>Priya Nair</td><td>Maintenance Engineer</td><td>Chennai</td><td><span class="pill pill-ok">Active</span></td><td class="mono">1 hr ago</td></tr>
+            <tr><td>Vikram Singh</td><td>Procurement Manager</td><td>All Hubs</td><td><span class="pill pill-warn">Away</span></td><td class="mono">Yesterday</td></tr>
+            <tr><td>Sneha Iyer</td><td>Sustainability Officer</td><td>All Hubs</td><td><span class="pill pill-ok">Active</span></td><td class="mono">2 hrs ago</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<script>
+/* ===== VIEW ROUTING ===== */
+function showAuth(mode){
+  document.getElementById('landing-view').style.display='none';
+  document.getElementById('app-view').style.display='none';
+  document.getElementById('auth-view').style.display='flex';
+  ['login','signup','forgot','otp'].forEach(m=>document.getElementById('auth-'+m).style.display = (m===mode?'block':'none'));
+}
+function pickRole(el){
+  document.querySelectorAll('.role-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sbRoleTag').innerText = el.dataset.role;
+}
+function enterApp(){
+  document.getElementById('landing-view').style.display='none';
+  document.getElementById('auth-view').style.display='none';
+  document.getElementById('app-view').style.display='block';
+  setTimeout(initCharts, 30);
+}
+function backToLanding(){
+  document.getElementById('app-view').style.display='none';
+  document.getElementById('landing-view').style.display='block';
+  window.scrollTo(0,0);
+}
+function nav(view, el){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+}
+
+/* ===== FLEET TABLE DATA ===== */
+const fleetData = [
+  ['KA-05-EV-1187','Bengaluru Hub',92,'Good',18420,31,'Charging'],
+  ['MH-14-EV-2291','Pune Hub',58,'Watch',44210,39,'Active'],
+  ['TN-09-EV-0654','Chennai Hub',71,'Watch',36880,35,'In Service'],
+  ['PB-03-EV-0912','Bengaluru Hub',88,'Good',9120,29,'Active'],
+  ['KA-05-EV-1342','Bengaluru Hub',95,'Good',5410,28,'Idle'],
+  ['MH-14-EV-2455','Pune Hub',34,'Critical',61200,42,'In Service'],
+  ['TN-09-EV-0781','Chennai Hub',81,'Good',22190,32,'Charging'],
+  ['PB-03-EV-1023','Pune Hub',67,'Watch',38940,37,'Active'],
+  ['KA-05-EV-1509','Bengaluru Hub',90,'Good',12300,30,'Active'],
+  ['TN-09-EV-0899','Chennai Hub',76,'Watch',29870,34,'Idle'],
+];
+function healthColor(h){ if(h>=80) return 'var(--ok)'; if(h>=55) return 'var(--warn)'; return 'var(--danger)'; }
+function statusPill(s){
+  const map = {'Active':'pill-ok','Charging':'pill-info','Idle':'pill-warn','In Service':'pill-danger'};
+  return `<span class="pill ${map[s]||'pill-info'}">${s}</span>`;
+}
+const tbody = document.querySelector('#fleetTable tbody');
+fleetData.forEach(r=>{
+  const [id,loc,batt,health,mi,temp,status] = r;
+  tbody.innerHTML += `<tr>
+    <td class="veh-id">${id}</td><td>${loc}</td>
+    <td><span class="bar-bg"><span class="bar-fill" style="width:${batt}%;background:${healthColor(batt)}"></span></span>${batt}%</td>
+    <td><span class="pill ${health==='Good'?'pill-ok':health==='Watch'?'pill-warn':'pill-danger'}">${health}</span></td>
+    <td class="mono">${mi.toLocaleString()} km</td><td class="mono">${temp}°C</td><td>${statusPill(status)}</td>
+  </tr>`;
+});
+
+/* ===== RISK MAP ===== */
+const riskItems = [
+  ['Lithium','China',72],['Nickel','Brazil',85],['Cobalt','DRC',54],['LFP Cells','China',79],['LFP Cells','India',91],
+  ['Lithium','Australia',88],['Nickel','Indonesia',63],['Cobalt','Zambia',69],['Lithium','Chile',81],['LFP Cells','S.Korea',86]
+];
+const riskMapEl = document.getElementById('riskMap');
+riskItems.forEach(([mat,ctry,score])=>{
+  const color = score>=80?'rgba(0,229,168,0.16)':score>=60?'rgba(251,191,36,0.16)':'rgba(251,113,133,0.16)';
+  const border = score>=80?'rgba(0,229,168,0.35)':score>=60?'rgba(251,191,36,0.35)':'rgba(251,113,133,0.35)';
+  riskMapEl.innerHTML += `<div class="risk-cell" style="background:${color};border:1px solid ${border}"><b>${score}</b>${mat}<div style="opacity:.7">${ctry}</div></div>`;
+});
+
+/* ===== COPILOT ===== */
+const copilotAnswers = {
+  'Which vehicles should be replaced first?': `Based on degradation slope and RUL, prioritize:<ul><li><b>MH-14-EV-2455</b> — 34% health, critical risk</li><li><b>MH-14-EV-2291</b> — 58% health, thermal anomaly flagged</li><li><b>TN-09-EV-0654</b> — 71% health, brake service overdue</li></ul>Recommend budgeting for 3 replacements in FY27 Q1.`,
+  'Which supplier has highest risk?': `<b>Glencore (Cobalt, DRC)</b> currently scores 54/100 — the lowest in your supplier base, driven by regional logistics volatility. Suggested alternative: <b>Umicore</b>, with stronger delivery reliability.`,
+  'Predict maintenance next month': `Model forecasts <b>23 service events</b> next month across the fleet — 5 critical (brakes, coolant), 11 medium (tires, filters), 7 routine. Chennai hub carries the highest load at 40% of predicted events.`,
+  'How can I reduce emissions?': `Top 3 levers ranked by impact:<ul><li>Shift 30% more charging to off-peak renewable-heavy grid hours</li><li>Cap fast-charging frequency fleet-wide to extend battery efficiency</li><li>Retire the 4 lowest-health ICE-hybrid units ahead of schedule</li></ul>Combined, this could add ~2.1K t CO₂ savings this fiscal year.`,
+  'Generate fleet report': `Fleet Summary — Jul 2026: 4,208 vehicles, 3,142 active EVs, avg battery health 86.4%, 27 open alerts, 18.4K t CO₂ saved YTD. Full PDF queued — you'll find it under <b>Reports</b> in a moment.`,
+  'Why is battery health decreasing?': `Fleet-wide, the primary driver is <b>fast-charge overuse</b> (46% average frequency vs. 30% recommended), compounded by sustained operating temps above 32°C in the Chennai and Pune hubs. Both are addressable via charging-policy changes.`
+};
+function askCopilot(q){ document.getElementById('chatInput').value=q; sendChat(); }
+function sendChat(){
+  const inp = document.getElementById('chatInput');
+  const q = inp.value.trim(); if(!q) return;
+  const log = document.getElementById('chatLog');
+  log.innerHTML += `<div class="msg user">${q}</div>`;
+  inp.value=''; log.scrollTop = log.scrollHeight;
+  setTimeout(()=>{
+    const ans = copilotAnswers[q] || `Analyzing fleet, battery and supply-chain signals for: "<b>${q}</b>"... Based on current telemetry, I'd recommend checking the relevant module for a full breakdown, and I can generate a report if useful.`;
+    log.innerHTML += `<div class="msg bot">${ans}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }, 550);
+}
+
+/* ===== TOAST + MODAL SYSTEM ===== */
+function toast(msg){
+  const host = document.getElementById('toastHost');
+  const el = document.createElement('div');
+  el.className='toast';
+  el.innerHTML = `<span class="tick">✓</span><span>${msg}</span>`;
+  host.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 3200);
+}
+function openModal(title, bodyHtml){
+  document.getElementById('modalTitle').innerText = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalHost').classList.add('open');
+}
+function closeModal(){ document.getElementById('modalHost').classList.remove('open'); }
+function toggleNotif(){ document.getElementById('notifPop').classList.toggle('open'); }
+document.addEventListener('click', (e)=>{
+  const pop = document.getElementById('notifPop');
+  if(pop && pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('#notifBtn')) pop.classList.remove('open');
+});
+
+/* ===== SVG CHART ENGINE (no external libraries) ===== */
+const palette = {volt:'#00E5A8', cyan:'#00C2FF', sky:'#38BDF8', warn:'#FBBF24', danger:'#FB7185', grey:'#334155'};
+
+function svgLine(containerId, series, labels, opts={}){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const W=600, H=opts.height||160, pad=14, padB = opts.showLabels? 26:14;
+  const allVals = series.flatMap(s=>s.data.filter(v=>v!==null && v!==undefined));
+  const max = opts.max!==undefined? opts.max : Math.max(...allVals)*1.08;
+  const min = opts.min!==undefined? opts.min : Math.min(0, Math.min(...allVals));
+  const n = labels.length;
+  const stepX = n>1 ? (W-2*pad)/(n-1) : 0;
+  const scaleY = v => (H-padB) - ((v-min)/((max-min)||1))*((H-padB)-pad);
+  let grid='';
+  if(!opts.noGrid){
+    for(let i=0;i<=3;i++){ const y=pad+i*((H-padB)-pad)/3; grid+=`<line x1="${pad}" y1="${y.toFixed(1)}" x2="${W-pad}" y2="${y.toFixed(1)}" stroke="rgba(148,163,184,0.09)" stroke-width="1"/>`; }
+  }
+  let body='';
+  series.forEach(s=>{
+    let d='', started=false;
+    s.data.forEach((v,i)=>{
+      if(v===null||v===undefined){ started=false; return; }
+      const x=(pad+i*stepX).toFixed(1), y=scaleY(v).toFixed(1);
+      d += (started?'L':'M')+x+','+y+' ';
+      started=true;
+    });
+    if(s.fill){
+      const lastIdx = s.data.map((v,i)=>v!==null?i:-1).filter(i=>i>=0);
+      const x0=(pad+lastIdx[0]*stepX).toFixed(1), x1=(pad+lastIdx[lastIdx.length-1]*stepX).toFixed(1);
+      body += `<path d="${d} L${x1},${(H-padB).toFixed(1)} L${x0},${(H-padB).toFixed(1)} Z" fill="${s.color}" fill-opacity="0.13" stroke="none"/>`;
+    }
+    body += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.4" ${s.dash?`stroke-dasharray="${s.dash}"`:''} stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(opts.dots!==false){
+      s.data.forEach((v,i)=>{ if(v===null||v===undefined) return; const x=(pad+i*stepX).toFixed(1), y=scaleY(v).toFixed(1); body+=`<circle cx="${x}" cy="${y}" r="2.6" fill="${s.color}"/>`; });
+    }
+  });
+  let labelsMk='';
+  if(opts.showLabels){
+    const showEvery = Math.ceil(n/7);
+    labels.forEach((lab,i)=>{
+      if(i%showEvery!==0 && i!==n-1) return;
+      const x=(pad+i*stepX).toFixed(1);
+      labelsMk += `<text x="${x}" y="${H-6}" font-size="10" fill="#64748B" text-anchor="middle" font-family="JetBrains Mono, monospace">${lab}</text>`;
+    });
+  }
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:${H}px">${grid}${body}${labelsMk}</svg>`
+    + legendRow(series);
+}
+
+function legendRow(series){
+  if(!series.some(s=>s.label)) return '';
+  return `<div class="legend-row">${series.filter(s=>s.label).map(s=>`<span><i style="background:${s.color}"></i>${s.label}</span>`).join('')}</div>`;
+}
+
+function svgBar(containerId, labels, series, opts={}){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const W=600, H=opts.height||160, pad=14, padB=26;
+  const horizontal = opts.horizontal;
+  const stacked = opts.stacked;
+  const n = labels.length;
+  let maxVal;
+  if(stacked) maxVal = Math.max(...labels.map((_,i)=> series.reduce((a,s)=>a+(s.data[i]||0),0)));
+  else maxVal = Math.max(...series.flatMap(s=>s.data));
+  maxVal = maxVal*1.15 || 1;
+
+  let grid='', bars='', labelsMk='';
+  if(horizontal){
+    const rowH = (H-padB)/n;
+    labels.forEach((lab,i)=>{
+      const v = series[0].data[i];
+      const w = (v/maxVal)*(W-pad-90);
+      const y = i*rowH + rowH*0.22;
+      const barH = rowH*0.56;
+      const color = Array.isArray(series[0].color) ? series[0].color[i] : series[0].color;
+      bars += `<rect x="90" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${barH.toFixed(1)}" rx="4" fill="${color}"/>`;
+      bars += `<text x="86" y="${(y+barH*0.72).toFixed(1)}" font-size="10.5" fill="#94A3B8" text-anchor="end" font-family="Inter,sans-serif">${lab}</text>`;
+      bars += `<text x="${(96+w).toFixed(1)}" y="${(y+barH*0.72).toFixed(1)}" font-size="10.5" fill="#F1F5F9" font-family='JetBrains Mono,monospace' font-weight="600">${v}</text>`;
+    });
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">${bars}</svg>`;
+    return;
+  }
+
+  const groupW = (W-2*pad)/n;
+  const barGroupPad = groupW*0.16;
+  const barsPerGroup = stacked?1:series.length;
+  const barW = (groupW-2*barGroupPad)/barsPerGroup;
+  for(let i=0;i<=3;i++){ const y=pad+i*((H-padB)-pad)/3; grid+=`<line x1="${pad}" y1="${y.toFixed(1)}" x2="${W-pad}" y2="${y.toFixed(1)}" stroke="rgba(148,163,184,0.09)"/>`; }
+  labels.forEach((lab,i)=>{
+    let stackY = H-padB;
+    series.forEach((s,si)=>{
+      const v = s.data[i]||0;
+      const h = (v/maxVal)*((H-padB)-pad);
+      const x = pad+i*groupW+barGroupPad + (stacked?0:si*barW);
+      const y = stacked? stackY-h : (H-padB)-h;
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(barW-3).toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${s.color}"/>`;
+      if(stacked) stackY -= h;
+    });
+    const xLab = (pad+i*groupW+groupW/2).toFixed(1);
+    labelsMk += `<text x="${xLab}" y="${H-6}" font-size="10" fill="#64748B" text-anchor="middle" font-family="Inter,sans-serif">${lab}</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">${grid}${bars}${labelsMk}</svg>` + legendRow(series);
+}
+
+function svgDoughnut(containerId, pct, color){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const size=170, r=58, cx=size/2, cy=size/2, sw=17;
+  const circumf = 2*Math.PI*r;
+  const dash = circumf*(pct/100);
+  el.innerHTML = `<svg viewBox="0 0 ${size} ${size}" style="width:100%;max-width:180px;height:${el.style.height||'140px'};display:block;margin:0 auto">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1E293B" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(1)} ${(circumf-dash).toFixed(1)}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="${cy+7}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" fill="#F1F5F9">${pct}%</text>
+  </svg>`;
+}
+
+function svgGauge(score){
+  const el = document.getElementById('gaugeChart');
+  if(!el) return;
+  const W=220,H=130,cx=110,cy=115,r=90,sw=16;
+  const endAngle = Math.PI + Math.PI*(score/100);
+  const x2 = (cx+r*Math.cos(endAngle)).toFixed(1), y2=(cy+r*Math.sin(endAngle)).toFixed(1);
+  const large = (endAngle-Math.PI) > Math.PI ? 1:0;
+  const color = score>=75?'#00E5A8':score>=50?'#FBBF24':'#FB7185';
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:220px;height:130px;display:block;margin:0 auto">
+    <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="${sw}" stroke-linecap="round"/>
+    <path d="M ${cx-r} ${cy} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ===== BATTERY SIMULATOR ===== */
+function updateBattery(){
+  const cycles = +document.getElementById('v1').value;
+  const temp = +document.getElementById('v2').value;
+  const usage = +document.getElementById('v3').value;
+  const fast = +document.getElementById('v4').value;
+  let score = 100 - (cycles/600)*22 - Math.max(0,(temp-28))*0.9 - (usage/350)*10 - (fast/100)*20;
+  score = Math.max(20, Math.min(97, Math.round(score)));
+  document.getElementById('gaugeVal').innerText = score+'%';
+  document.getElementById('gaugeVal').style.color = score>=75?'#00E5A8':score>=50?'#FBBF24':'#FB7185';
+  const rul = Math.max(0.4,(score/100*5.2)).toFixed(1);
+  document.getElementById('rulVal').innerText = rul+' yrs';
+  const risk = score>=75?'Low':score>=50?'Moderate':'High';
+  const riskEl = document.getElementById('riskVal');
+  riskEl.innerText = risk; riskEl.style.color = score>=75?'#00E5A8':score>=50?'#FBBF24':'#FB7185';
+  svgGauge(score);
+  renderBattProjection(score);
+}
+function renderBattProjection(score){
+  const data = [score,score*0.95,score*0.89,score*0.83,score*0.75,score*0.68,score*0.60,score*0.51,score*0.41].map(v=>Math.round(v));
+  svgLine('chartBattProject', [{data, color:palette.volt, fill:true}], ['Now','6mo','1yr','1.5yr','2yr','2.5yr','3yr','3.5yr','4yr'], {height:180, showLabels:true, min:0, max:100, dots:false});
+}
+
+/* ===== RENDER ALL CHARTS (SVG, no external deps) ===== */
+let chartsInit=false;
+function initCharts(){
+  if(chartsInit) return; chartsInit=true;
+
+  svgLine('heroPulse', [{data:[40,42,38,50,55,48,60,58,65,62,70,68,75,72,80,78,85,82,88,86,90,89,93,92], color:palette.volt, fill:true}], Array.from({length:24},(_,i)=>i), {height:90, noGrid:true, dots:false});
+
+  svgLine('chartUtil', [
+    {data:[68,70,72,71,75,78,74,79,82,80,83,85,84,87], color:palette.volt, fill:true, label:'Utilization %'},
+    {data:Array(14).fill(80), color:palette.grey, dash:'4,4', label:'Target'}
+  ], ['D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D12','D13','D14'], {height:170, showLabels:true, dots:false});
+
+  svgLine('chartBattTrend', [{data:[91,90,89,88,87,86.8,86.4], color:palette.sky, fill:true}], ['Jan','Feb','Mar','Apr','May','Jun','Jul'], {height:140, showLabels:true, min:80});
+
+  svgBar('chartEnergy', ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], [{data:[4200,4600,4100,4800,5200,3900,3400], color:palette.cyan}], {height:140});
+
+  svgDoughnut('chartCarbonSmall', 64, palette.volt);
+
+  svgBar('chartCharging', ['Bengaluru','Pune','Chennai'], [
+    {data:[420,310,260], color:palette.volt, label:'Fast'},
+    {data:[280,190,240], color:palette.cyan, label:'Standard'}
+  ], {height:170, stacked:true});
+
+  renderBattProjection(82);
+  svgGauge(82);
+
+  svgBar('chartMaintTimeline', ['This wk','+1wk','+2wk','+3wk','+4wk'], [
+    {data:[5,3,1,0,2], color:palette.danger, label:'Critical'},
+    {data:[8,7,9,6,5], color:palette.warn, label:'Medium'},
+    {data:[10,9,11,8,7], color:palette.cyan, label:'Routine'}
+  ], {height:180, stacked:true});
+
+  svgBar('chartDelay', ['Lithium','Nickel','Cobalt','LFP Cells'], [
+    {data:[18,9,34,14], color:[palette.warn, palette.volt, palette.danger, palette.cyan]}
+  ], {height:180, horizontal:true});
+
+  svgLine('chartLoad', [{data:[0.6,0.4,0.3,0.5,1.8,2.1,1.9,1.6,2.4,2.6,2.0,1.1], color:palette.cyan, fill:true}], ['00','02','04','06','08','10','12','14','16','18','20','22'], {height:180, showLabels:true, dots:false});
+
+  svgLine('chartCO2', [
+    {data:[9.1,13.6,18.4,null,null,null], color:palette.volt, fill:true, label:'Actual', dots:true},
+    {data:[null,null,18.4,24.2,30.1,36.0], color:palette.sky, dash:'5,4', label:'Projected'}
+  ], ['FY24','FY25','FY26','FY27(P)','FY28(P)','FY29(P)'], {height:180, showLabels:true, min:0});
+}
+
+/* ===== FLEET: ADD VEHICLE + MAP VIEW ===== */
+function openAddVehicle(){
+  openModal('Add Vehicle', `
+    <div class="field"><label>Vehicle ID</label><input id="nvId" placeholder="e.g. KA-05-EV-2001"></div>
+    <div class="field"><label>Hub</label><select id="nvHub" style="width:100%;padding:12px 14px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);color:var(--text-hi);font-size:14px;"><option>Bengaluru Hub</option><option>Pune Hub</option><option>Chennai Hub</option></select></div>
+    <div class="field"><label>Battery %</label><input id="nvBatt" type="number" value="95" min="1" max="100"></div>
+    <div class="field"><label>Status</label><select id="nvStatus" style="width:100%;padding:12px 14px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);color:var(--text-hi);font-size:14px;"><option>Active</option><option>Charging</option><option>Idle</option><option>In Service</option></select></div>
+    <div class="modal-actions"><a class="btn btn-ghost" onclick="closeModal()">Cancel</a><a class="btn btn-primary" onclick="submitAddVehicle()">Add Vehicle</a></div>
+  `);
+}
+function submitAddVehicle(){
+  const id = document.getElementById('nvId').value.trim() || `NEW-${Math.floor(Math.random()*9000+1000)}`;
+  const hub = document.getElementById('nvHub').value;
+  const batt = +document.getElementById('nvBatt').value || 90;
+  const status = document.getElementById('nvStatus').value;
+  const health = batt>=80?'Good':batt>=55?'Watch':'Critical';
+  const row = [id, hub, batt, health, Math.floor(Math.random()*5000), 28+Math.floor(Math.random()*10), status];
+  fleetData.unshift(row);
+  renderFleetTable();
+  closeModal();
+  toast(`${id} added to fleet`);
+}
+function renderFleetTable(rows){
+  const tbody = document.querySelector('#fleetTable tbody');
+  tbody.innerHTML = '';
+  const data = rows || fleetData;
+  if(data.length===0){ tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-low);padding:28px;">No vehicles match these filters.</td></tr>`; return; }
+  data.forEach(r=>{
+    const [id,loc,batt,health,mi,temp,status] = r;
+    tbody.innerHTML += `<tr>
+      <td class="veh-id">${id}</td><td>${loc}</td>
+      <td><span class="bar-bg"><span class="bar-fill" style="width:${batt}%;background:${healthColor(batt)}"></span></span>${batt}%</td>
+      <td><span class="pill ${health==='Good'?'pill-ok':health==='Watch'?'pill-warn':'pill-danger'}">${health}</span></td>
+      <td class="mono">${mi.toLocaleString()} km</td><td class="mono">${temp}°C</td><td>${statusPill(status)}</td>
+    </tr>`;
+  });
+}
+function filterFleet(){
+  const q = (document.getElementById('fleetSearch').value||'').toLowerCase();
+  const st = document.getElementById('fleetStatusFilter').value;
+  const hub = document.getElementById('fleetHubFilter').value;
+  const health = document.getElementById('fleetHealthFilter').value;
+  const filtered = fleetData.filter(r=>{
+    const [id,loc,batt,h,mi,temp,status] = r;
+    if(q && !(id.toLowerCase().includes(q) || loc.toLowerCase().includes(q))) return false;
+    if(st && status!==st) return false;
+    if(hub && !loc.includes(hub)) return false;
+    if(health && h!==health) return false;
+    return true;
+  });
+  renderFleetTable(filtered);
+}
+let mapViewOn = false;
+function toggleMapView(btn){
+  mapViewOn = !mapViewOn;
+  const tableWrap = document.getElementById('fleetTableWrap');
+  const mapWrap = document.getElementById('fleetMapWrap');
+  if(mapViewOn){
+    tableWrap.style.display='none'; mapWrap.style.display='block'; btn.innerText='Table View';
+    renderFleetMap();
+  } else {
+    tableWrap.style.display='block'; mapWrap.style.display='none'; btn.innerText='Map View';
+  }
+}
+function renderFleetMap(){
+  const el = document.getElementById('fleetMapWrap');
+  const hubs = [
+    {name:'Bengaluru Hub', x:30, y:60, color:palette.volt},
+    {name:'Pune Hub', x:58, y:22, color:palette.cyan},
+    {name:'Chennai Hub', x:74, y:78, color:palette.warn}
+  ];
+  let pins = '';
+  fleetData.forEach((v,i)=>{
+    const hub = hubs.find(h=>v[1].startsWith(h.name.split(' ')[0])) || hubs[0];
+    const jitterX = hub.x + (Math.sin(i*13.7)*10);
+    const jitterY = hub.y + (Math.cos(i*9.3)*10);
+    const c = healthColor(v[2]).includes('ok')?palette.volt:v[2]>=80?palette.volt:v[2]>=55?palette.warn:palette.danger;
+    pins += `<div class="map-pin" style="left:${jitterX}%; top:${jitterY}%; background:${c}" title="${v[0]} — ${v[2]}% battery, ${v[6]}"></div>`;
+  });
+  let labels = hubs.map(h=>`<div class="map-hub-label" style="left:${h.x}%; top:${h.y+8}%">${h.name}</div>`).join('');
+  el.innerHTML = `<div class="panel glass fleet-map hex-tex">${pins}${labels}<p style="position:absolute;bottom:14px;left:20px;font-size:11px;color:var(--text-low)">Hover pins for vehicle detail · pin color = battery health</p></div>`;
+}
+
+/* ===== PROCUREMENT: ROI CALCULATOR ===== */
+function openROICalc(){
+  openModal('ROI Calculator', `
+    <p style="font-size:12.5px;color:var(--text-mid);margin-bottom:14px;">Estimate 3-year TCO for a fleet refresh.</p>
+    <div class="field"><label>Number of vehicles</label><input id="roiCount" type="number" value="40"></div>
+    <div class="field"><label>Manufacturer</label><select id="roiOem" style="width:100%;padding:12px 14px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);color:var(--text-hi);font-size:14px;">
+      <option value="18.5|4.2">Tata Ace EV</option><option value="17.9|4.0">Mahindra eSupro</option><option value="21.2|3.6">Ashok Leyland eDost</option><option value="26.4|3.9">Volvo Eicher Pro</option>
+    </select></div>
+    <div class="modal-actions"><a class="btn btn-ghost" onclick="closeModal()">Cancel</a><a class="btn btn-primary" onclick="calcROI()">Calculate</a></div>
+    <div id="roiResult" style="margin-top:16px;"></div>
+  `);
+}
+function calcROI(){
+  const count = +document.getElementById('roiCount').value || 40;
+  const [pricePerUnit, savingsPerUnit] = document.getElementById('roiOem').value.split('|').map(Number);
+  const upfront = (count*pricePerUnit).toFixed(1);
+  const annualSavings = (count*savingsPerUnit).toFixed(1);
+  const payback = (pricePerUnit/savingsPerUnit).toFixed(1);
+  document.getElementById('roiResult').innerHTML = `
+    <div class="reco-card"><div class="h"><b>Upfront Investment</b></div><p class="mono" style="font-size:16px;color:var(--text-hi)">₹${upfront} Cr</p></div>
+    <div class="reco-card"><div class="h"><b>Annual Fuel + Maintenance Savings</b></div><p class="mono" style="font-size:16px;color:var(--volt)">₹${annualSavings} Cr / yr</p></div>
+    <div class="reco-card"><div class="h"><b>Estimated Payback Period</b></div><p class="mono" style="font-size:16px;color:var(--text-hi)">${payback} years</p></div>
+  `;
+}
+
+/* ===== REPORTS / EXPORTS (real client-side file downloads) ===== */
+function downloadFile(filename, content, type){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function exportReport(name, format){
+  if(format==='CSV' || format==='Excel'){
+    const csv = `Report,Value\nVehicle Fleet,4208\nActive EVs,3142\nAvg Battery Health,86.4%\nCO2 Saved YTD,18400 t\nMaintenance Alerts,27\n`;
+    downloadFile(`${name.replace(/\s+/g,'_')}.csv`, csv, 'text/csv');
+  } else {
+    const txt = `VOLTMIND AI — ${name}\nGenerated: ${new Date().toLocaleString()}\n\nFleet Vehicles: 4,208\nActive EVs: 3,142\nAvg Battery Health: 86.4%\nCO2 Saved YTD: 18,400 t\nMaintenance Alerts: 27\nNet Zero Progress: 64%\n`;
+    downloadFile(`${name.replace(/\s+/g,'_')}.txt`, txt, 'text/plain');
+  }
+  toast(`${name} exported as ${format}`);
+}
+function downloadESG(){
+  const txt = `VOLTMIND AI — ESG & NET ZERO REPORT (FY26 H1)\nGenerated: ${new Date().toLocaleString()}\n\nScope 1 Emissions: 4.1K t (down 18% YoY)\nScope 2 Emissions: 2.6K t (down 11% YoY)\nNet Zero Progress: 64% — on track for FY29\nCO2 Saved YTD: 18,400 t\nEquivalent Trees: 306,700\n\nPrepared for Sustainability Officer review.\n`;
+  downloadFile('VoltMind_ESG_Report_FY26H1.txt', txt, 'text/plain');
+  toast('ESG report downloaded');
+}
+
+/* ===== ADMIN: INVITE USER ===== */
+function openInviteUser(){
+  openModal('Invite User', `
+    <div class="field"><label>Full name</label><input id="iuName" placeholder="e.g. Karthik Reddy"></div>
+    <div class="field"><label>Work email</label><input id="iuEmail" type="email" placeholder="karthik@company.com"></div>
+    <div class="field"><label>Role</label><select id="iuRole" style="width:100%;padding:12px 14px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);color:var(--text-hi);font-size:14px;">
+      <option>Fleet Manager</option><option>Maintenance Engineer</option><option>Procurement Manager</option><option>Sustainability Officer</option><option>Admin</option>
+    </select></div>
+    <div class="field"><label>Hub</label><select id="iuHub" style="width:100%;padding:12px 14px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);color:var(--text-hi);font-size:14px;">
+      <option>All Hubs</option><option>Bengaluru</option><option>Pune</option><option>Chennai</option>
+    </select></div>
+    <div class="modal-actions"><a class="btn btn-ghost" onclick="closeModal()">Cancel</a><a class="btn btn-primary" onclick="submitInvite()">Send Invite</a></div>
+  `);
+}
+function submitInvite(){
+  const name = document.getElementById('iuName').value.trim() || 'New User';
+  const role = document.getElementById('iuRole').value;
+  const hub = document.getElementById('iuHub').value;
+  const tbody = document.getElementById('adminUserTable');
+  const row = document.createElement('tr');
+  row.innerHTML = `<td>${name}</td><td>${role}</td><td>${hub}</td><td><span class="pill pill-warn">Invited</span></td><td class="mono">—</td>`;
+  tbody.prepend(row);
+  closeModal();
+  toast(`Invite sent to ${name}`);
+}
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', ()=>renderFleetTable());
+</script>
+</body>
+</html>
